@@ -11,7 +11,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Column 1: About */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Animal Aid Connect</h3>
+            <h3 className="text-lg font-semibold mb-4">Pet-Mate</h3>
             <p className="text-gray-600 mb-4">
               Connecting those who find injured animals with the organizations 
               that can help them.

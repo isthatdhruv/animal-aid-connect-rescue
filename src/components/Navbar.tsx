@@ -19,7 +19,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <span className="text-primary text-2xl font-bold">Animal Aid Connect</span>
+            <span className="text-primary text-2xl font-bold">Pet-Mate</span>
           </Link>
 
           {/* Mobile menu button */}
