@@ -24,6 +24,7 @@ export type Database = {
           total_rescues: number
           transport: boolean
           website: string | null
+          role: string
         }
         Insert: {
           animals?: string[]
@@ -39,6 +40,7 @@ export type Database = {
           total_rescues?: number
           transport?: boolean
           website?: string | null
+          role?: string
         }
         Update: {
           animals?: string[]
@@ -54,6 +56,7 @@ export type Database = {
           total_rescues?: number
           transport?: boolean
           website?: string | null
+          role?: string
         }
         Relationships: []
       }

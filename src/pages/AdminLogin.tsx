@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -48,11 +47,25 @@ const AdminLogin = () => {
         throw new Error("No user returned from authentication");
       }
 
+      // Check if user has admin role
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      if (!profile || profile.role !== 'admin') {
+        throw new Error("You do not have admin privileges");
+      }
+
       // Create admin user object
       const adminUser = {
         id: user.id,
         email: user.email!,
-        name: "Administrator"
+        name: "Administrator",
+        role: 'admin'
       };
       
       // Update auth context

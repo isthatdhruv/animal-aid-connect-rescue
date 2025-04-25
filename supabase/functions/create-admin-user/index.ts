@@ -1,55 +1,105 @@
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "jsr:@supabase/supabase-js@2";
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS'
+};
 
-serve(async (req) => {
-  // Only allow POST requests
-  if (req.method !== 'POST') {
-    return new Response('Method Not Allowed', { status: 405 })
+Deno.serve(async (req: Request) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
   }
 
-  // Create Supabase client
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-  )
-
-  try {
-    // Create admin user
-    const { data, error } = await supabase.auth.admin.createUser({
-      email: 'admin@petmate.com',
-      password: 'admin@123',
-      user_metadata: {
-        role: 'admin'
+  if (req.method === 'POST') {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
       }
-    })
+    });
 
-    if (error) throw error
+    const { email, password } = await req.json();
 
-    // Create admin profile
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .update({ 
-        status: 'Approved', 
-        profile_complete: true 
-      })
-      .eq('id', data.user?.id)
+    try {
+      // Create the admin user
+      const { data: { user }, error } = await supabaseClient.auth.admin.createUser({
+        email: email,
+        password: password,
+        email_confirm: true,
+        user_metadata: {
+          role: 'admin'
+        }
+      });
 
-    if (profileError) throw profileError
+      if (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        });
+      }
 
-    return new Response(JSON.stringify({ 
-      message: 'Admin user created successfully' 
-    }), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 200
-    })
+      if (!user) {
+        return new Response(JSON.stringify({ error: 'No user returned from authentication' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        });
+      }
 
-  } catch (err) {
-    return new Response(JSON.stringify({ 
-      error: err.message 
-    }), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 500
-    })
+      // Create admin profile
+      const { error: profileError } = await supabaseClient
+        .from('profiles')
+        .insert({
+          id: user.id,
+          name: 'Administrator',
+          email: user.email,
+          role: 'admin',
+          status: 'active',
+          registered_at: new Date().toISOString(),
+          animals: [],
+          profile_complete: true,
+          rating: 0,
+          total_rescues: 0,
+          transport: false,
+          location: {
+            lat: 0,
+            lng: 0,
+            address: 'Admin Location'
+          }
+        });
+
+      if (profileError) {
+        return new Response(JSON.stringify({ error: profileError.message }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        });
+      }
+
+      return new Response(JSON.stringify({ 
+        message: 'Admin user created successfully',
+        user: {
+          id: user.id,
+          email: user.email,
+          role: 'admin'
+        }
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      });
+    }
   }
-})
+
+  return new Response('Method not allowed', { 
+    headers: corsHeaders,
+    status: 405 
+  });
+});
