@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
-import { adminApi } from "@/services/api";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -17,17 +17,17 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!username || !password) {
+    if (!email || !password) {
       toast({
         title: "Missing fields",
-        description: "Please enter both username and password",
+        description: "Please enter both email and password",
         variant: "destructive",
       });
       return;
@@ -36,37 +36,39 @@ const AdminLogin = () => {
     setIsLoading(true);
     
     try {
-      // In a real app, this would make an API call
-      // const response = await adminApi.login({ username, password });
+      // Sign in with Supabase auth
+      const { data: { user, session }, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Check if credentials match (this would be done server-side in a real app)
-      if (username === "admin" && password === "password") {
-        // Dummy admin user
-        const adminUser = {
-          id: "admin1",
-          email: username,
-          name: "Administrator"
-        };
-        
-        login(adminUser, "admin");
-        
-        toast({
-          title: "Login successful",
-          description: "Welcome to the admin dashboard.",
-        });
-        
-        navigate("/admin/dashboard");
-      } else {
-        throw new Error("Invalid credentials");
+      if (!user) {
+        throw new Error("No user returned from authentication");
       }
-    } catch (error) {
+
+      // Create admin user object
+      const adminUser = {
+        id: user.id,
+        email: user.email!,
+        name: "Administrator"
+      };
+      
+      // Update auth context
+      login(adminUser, "admin");
+      
+      toast({
+        title: "Login successful",
+        description: "Welcome to the admin dashboard.",
+      });
+      
+      navigate("/admin/dashboard");
+    } catch (error: any) {
       console.error("Login error:", error);
       toast({
         title: "Login failed",
-        description: "Invalid admin credentials. Please try again.",
+        description: error.message || "Invalid admin credentials. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -99,13 +101,14 @@ const AdminLogin = () => {
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
-                      id="username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       disabled={isLoading}
-                      autoComplete="username"
+                      autoComplete="email"
                     />
                   </div>
                   

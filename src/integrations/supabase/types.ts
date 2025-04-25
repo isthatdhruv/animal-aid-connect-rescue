@@ -9,7 +9,114 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          animals: string[]
+          approved_at: string | null
+          contact_phone: string | null
+          id: string
+          location: Json
+          name: string
+          profile_complete: boolean
+          rating: number
+          registered_at: string
+          status: string
+          total_rescues: number
+          transport: boolean
+          website: string | null
+        }
+        Insert: {
+          animals?: string[]
+          approved_at?: string | null
+          contact_phone?: string | null
+          id: string
+          location?: Json
+          name: string
+          profile_complete?: boolean
+          rating?: number
+          registered_at?: string
+          status?: string
+          total_rescues?: number
+          transport?: boolean
+          website?: string | null
+        }
+        Update: {
+          animals?: string[]
+          approved_at?: string | null
+          contact_phone?: string | null
+          id?: string
+          location?: Json
+          name?: string
+          profile_complete?: boolean
+          rating?: number
+          registered_at?: string
+          status?: string
+          total_rescues?: number
+          transport?: boolean
+          website?: string | null
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          animal_type: string
+          closed_at: string | null
+          closed_by_ngo_id: string | null
+          flagged_at: string | null
+          flagged_by_ngo_id: string | null
+          id: string
+          image_url: string | null
+          location: Json
+          reported_at: string
+          reporter_phone: string | null
+          severity: number
+          status: string
+        }
+        Insert: {
+          animal_type: string
+          closed_at?: string | null
+          closed_by_ngo_id?: string | null
+          flagged_at?: string | null
+          flagged_by_ngo_id?: string | null
+          id?: string
+          image_url?: string | null
+          location: Json
+          reported_at?: string
+          reporter_phone?: string | null
+          severity: number
+          status?: string
+        }
+        Update: {
+          animal_type?: string
+          closed_at?: string | null
+          closed_by_ngo_id?: string | null
+          flagged_at?: string | null
+          flagged_by_ngo_id?: string | null
+          id?: string
+          image_url?: string | null
+          location?: Json
+          reported_at?: string
+          reporter_phone?: string | null
+          severity?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_closed_by_ngo_id_fkey"
+            columns: ["closed_by_ngo_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_flagged_by_ngo_id_fkey"
+            columns: ["flagged_by_ngo_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
