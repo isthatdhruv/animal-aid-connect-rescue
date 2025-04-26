@@ -1,3 +1,4 @@
+```txt
 🐾 Petmate :
 
 Petmate is a web app that seeks to simplify the reporting and management of animal rescues. Utilizing cutting-edge web technologies, it provides real-time interaction between animal enthusiasts, rescue groups, and volunteers to provide prompt help to animals in distress.
@@ -15,22 +16,23 @@ Backend: Supabase for authentication and database services.
 
 TypeScript: Type safety and improved developer experience.
 
-📂 Project Structure :
+
+## 📂 Project Structure
+
 
 animal-aid-connect-rescue/
 ├── public/             # Static assets
 ├── src/                # Source code
 │   ├── components/     # Reusable UI components
-│   ├── pages/          # Pages of the application
+│   ├── pages/          # Application pages
 │   ├── utils/          # Utility functions
-│   └──.                # Other folders
-├── supabase/           # Supabase setup
-├── .env                # Variables d'environnement
-├── index.html          # HTML file principal
-├── package.json        # Project metadata et scripts
-├── tailwind.config.ts  # Configuration de Tailwind CSS
+│   └── ...             # Other directories
+├── supabase/           # Supabase configuration
+├── .env                # Environment variables
+├── index.html          # Main HTML file
+├── package.json        # Project metadata and scripts
+├── tailwind.config.ts  # Tailwind CSS configuration
 └── vite.config.ts      # Vite configuration
-
 
  🔧 Getting Started
 
