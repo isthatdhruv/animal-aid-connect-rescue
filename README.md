@@ -1,73 +1,127 @@
-# Welcome to your Lovable project
+🐾 Petmate :
 
-## Project info
+Petmate is a web app that seeks to simplify the reporting and management of animal rescues. Utilizing cutting-edge web technologies, it provides real-time interaction between animal enthusiasts, rescue groups, and volunteers to provide prompt help to animals in distress.
 
-**URL**: https://lovable.dev/projects/c5161762-d7c5-425a-9af8-9c508f16eeea
 
-## How can I edit this code?
+🚀  Project Overview :
 
-There are several ways of editing your application.
+This project is developed with:
 
-**Use Lovable**
+Framework: Vite for fast development and hot module replacement.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c5161762-d7c5-425a-9af8-9c508f16eeea) and start prompting.
+Styling: Tailwind CSS for utility-first CSS styling.
 
-Changes made via Lovable will be committed automatically to this repo.
+Backend: Supabase for authentication and database services.
 
-**Use your preferred IDE**
+TypeScript: Type safety and improved developer experience.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+📂 Project Structure :
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+animal-aid-connect-rescue/
+├── public/             # Static assets
+├── src/                # Source code
+│   ├── components/     # Reusable UI components
+│   ├── pages/          # Pages of the application
+│   ├── utils/          # Utility functions
+│   └──.                # Other folders
+├── supabase/           # Supabase setup
+├── .env                # Variables d'environnement
+├── index.html          # HTML file principal
+├── package.json        # Project metadata et scripts
+├── tailwind.config.ts  # Configuration de Tailwind CSS
+└── vite.config.ts      # Vite configuration
 
-Follow these steps:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+ 🔧 Getting Started
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Prerequisites
 
-# Step 3: Install the necessary dependencies.
-npm i
+Make sure you have the following installed:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+ Node.js (v14 or later)
+
+ npm or Yarn
+
+ Supabase Account for backend services
+
+Installation
+
+1)Clone the repository:
+
+git clone https://github.com/isthatdhruv/animal-aid-connect-rescue.git
+cd animal-aid-connect-rescue
+
+2)Install dependencies:
+
+Using npm:
+
+npm install
+
+
+Or using Yarn:
+
+yarn install
+
+
+3)Setup environment variables:
+
+Create a .env file in the project root and include your Supabase credentials:
+
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+
+
+Replace your-supabase-url and your-supabase-anon-key with your actual Supabase project details.
+
+4)Start the development server:
+
+Using npm:
+
 npm run dev
-```
 
-**Edit a file directly in GitHub**
+Or using Yarn:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+yarn dev
 
-**Use GitHub Codespaces**
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+The application will be accessible at http://localhost:3000.
 
-## What technologies are used for this project?
+ 🛠️ Available Scripts
 
-This project is built with:
+npm run dev: Starts the development server.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+npm run build: Compiles the app to production.
 
-## How can I deploy this project?
+npm run preview: Locally previews the production build.
 
-Simply open [Lovable](https://lovable.dev/projects/c5161762-d7c5-425a-9af8-9c508f16eeea) and click on Share -> Publish.
+npm run lint: Executes ESLint to scan code for potential issues.
 
-## Can I connect a custom domain to my Lovable project?
+🤝Contributing
 
-Yes, you can!
+Contributions are appreciated! Please do this:
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1)Fork the repository.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+2)Create a new branch:
+
+git checkout -b feature/your-feature-name
+
+3)Make your changes and commit:
+
+git commit -m "Add your message here"
+	
+4)Push to your forked repository:
+
+git push origin feature/your-feature-name
+
+5)Open a pull request.
+
+Please ensure your code adheres to the project's coding standards and passes all linting checks.
+
+📄License
+
+This project is licensed under the MIT License.
+
+📬 Contact
+
+For any inquiries or feedback, please contact INNOVATOR'S HIVE
