@@ -60,13 +60,13 @@ const Footer = () => {
               href="mailto:contact@animalaidconnect.org" 
               className="text-primary hover:underline"
             >
-              contact@animalaidconnect.org
+              contact@pet-mate.com
             </a>
           </div>
         </div>
         
         <div className="border-t border-gray-200 mt-8 pt-6 text-center text-gray-600">
-          <p>&copy; {currentYear} Animal Aid Connect. All rights reserved.</p>
+          <p>&copy; {currentYear} Pet-Mate. All rights reserved.</p>
         </div>
       </div>
     </footer>

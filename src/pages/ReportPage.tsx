@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -33,6 +32,7 @@ const ReportPage = () => {
   const [isDetectingLocation, setIsDetectingLocation] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [usingCamera, setUsingCamera] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Handle image upload
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,50 +174,116 @@ const ReportPage = () => {
   const startCamera = async () => {
     setUsingCamera(true);
     try {
-      const videoElement = document.getElementById("camera") as HTMLVideoElement;
-      if (videoElement) {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        videoElement.srcObject = stream;
+      // Check if mediaDevices is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("MediaDevices API not supported in this browser");
       }
-    } catch (error) {
-      console.error("Error accessing camera:", error);
-      toast({
-        title: "Camera access error",
-        description: "Could not access your camera. Please try uploading an image instead.",
-        variant: "destructive",
+
+      // List available devices first
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      console.log("Available video devices:", videoDevices);
+
+      if (videoDevices.length === 0) {
+        throw new Error("No video devices found");
+      }
+
+      const constraints = {
+        video: {
+          facingMode: "environment",
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      };
+
+      console.log("Attempting to access camera with constraints:", constraints);
+      
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      
+      if (!stream) {
+        throw new Error("No stream received from camera");
+      }
+
+      // Get the video element after stream is available
+      const videoElement = document.getElementById("camera") as HTMLVideoElement;
+      if (!videoElement) {
+        throw new Error("Camera element not found");
+      }
+
+      videoElement.srcObject = stream;
+      
+      // Wait for the video to be ready
+      await new Promise((resolve, reject) => {
+        videoElement.onloadedmetadata = () => {
+          videoElement.play()
+            .then(resolve)
+            .catch(reject);
+        };
+        videoElement.onerror = () => {
+          reject(new Error("Video element error"));
+        };
       });
+
+    } catch (error) {
+      console.error("Detailed camera error:", error);
       setUsingCamera(false);
+      
+      let errorMessage = "Could not access your camera. Please try uploading an image instead.";
+      
+      if (error instanceof Error) {
+        if (error.name === "NotAllowedError") {
+          errorMessage = "Camera access was denied. Please allow camera access in your browser settings.";
+        } else if (error.name === "NotFoundError") {
+          errorMessage = "No camera found. Please check your device's camera.";
+        } else if (error.name === "NotReadableError") {
+          errorMessage = "Camera is in use by another application. Please close other applications using the camera.";
+        } else if (error.name === "OverconstrainedError") {
+          errorMessage = "Camera constraints could not be satisfied. Please try a different camera.";
+        } else {
+          errorMessage = `Camera error: ${error.message}`;
+        }
+      }
+      
+      setError(errorMessage);
     }
   };
   
   const capturePhoto = () => {
     try {
       const videoElement = document.getElementById("camera") as HTMLVideoElement;
+      if (!videoElement || !videoElement.srcObject) {
+        throw new Error("Camera not initialized");
+      }
+
       const canvas = document.createElement("canvas");
       canvas.width = videoElement.videoWidth;
       canvas.height = videoElement.videoHeight;
       
       const context = canvas.getContext("2d");
-      if (context) {
-        context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-        
-        // Convert canvas to blob
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const file = new File([blob], "camera-capture.jpg", { type: "image/jpeg" });
-            setImage(file);
-            setImagePreview(canvas.toDataURL("image/jpeg"));
-            
-            // Stop camera stream
-            const stream = videoElement.srcObject as MediaStream;
-            const tracks = stream.getTracks();
-            tracks.forEach(track => track.stop());
-            videoElement.srcObject = null;
-            
-            setUsingCamera(false);
-          }
-        }, "image/jpeg");
+      if (!context) {
+        throw new Error("Could not get canvas context");
       }
+      
+      context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+      
+      // Convert canvas to blob
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const file = new File([blob], "camera-capture.jpg", { type: "image/jpeg" });
+          setImage(file);
+          setImagePreview(canvas.toDataURL("image/jpeg"));
+          
+          // Stop camera stream
+          const stream = videoElement.srcObject as MediaStream;
+          const tracks = stream.getTracks();
+          tracks.forEach(track => track.stop());
+          videoElement.srcObject = null;
+          
+          setUsingCamera(false);
+        } else {
+          throw new Error("Could not create image from camera");
+        }
+      }, "image/jpeg", 0.95); // 0.95 quality for better image
     } catch (error) {
       console.error("Error capturing photo:", error);
       toast({
@@ -225,6 +291,7 @@ const ReportPage = () => {
         description: "Could not capture photo. Please try again or upload an image.",
         variant: "destructive",
       });
+      setUsingCamera(false);
     }
   };
 
@@ -269,6 +336,7 @@ const ReportPage = () => {
                           id="camera" 
                           autoPlay 
                           playsInline 
+                          muted
                           className="w-full h-60 object-cover rounded-md bg-black"
                         ></video>
                         <div className="flex gap-2">
